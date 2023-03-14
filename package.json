@@ -1,6 +1,6 @@
 {
   "name": "sveltestrap",
-  "version": "5.10.0",
+  "version": "5.10.1",
   "main": "dist/sveltestrap.js",
   "module": "dist/sveltestrap.es.js",
   "jsnext:main": "dist/sveltestrap.es.js",
@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:bestguy/sveltestrap.git"
+    "url": "git@github.com:dbradleyfl/sveltestrap.git"
   },
   "files": [
     "dist",
@@ -96,7 +96,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "@popperjs/core": "^2.9.2"
+    "@floating-ui/dom": "^1.2.4"
   },
   "browserslist": "last 2 versions"
 }

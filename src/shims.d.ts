@@ -1,1 +1,1 @@
-declare module '@popperjs/core/dist/esm/popper';
+declare module '@floating-ui/dom';

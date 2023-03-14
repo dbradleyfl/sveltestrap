@@ -1,6 +1,6 @@
 <script>
   import { onDestroy, onMount } from 'svelte';
-  import { createPopper } from '@popperjs/core/dist/esm/popper';
+  import { computePosition } from '@floating-ui/dom';
   import classnames, { uuid } from './utils';
   import InlineContainer from './InlineContainer.svelte';
   import Portal from './Portal.svelte';
@@ -15,35 +15,24 @@
   export let placement = 'top';
   export let target = '';
   let bsPlacement;
-  let popperInstance;
   let popperPlacement = placement;
   let targetEl;
   let tooltipEl;
 
-  const checkPopperPlacement = {
-    name: 'checkPopperPlacement',
-    enabled: true,
-    phase: 'main',
-    fn({ state }) {
-      popperPlacement = state.placement;
-    }
-  };
-
   $: {
     if (isOpen && tooltipEl) {
-      popperInstance = createPopper(targetEl, tooltipEl, {
-        placement,
-        modifiers: [checkPopperPlacement]
+      computePosition(targetEl, tooltipEl).then((x, y) => {
+        Object.assign(tooltipEl.style, {
+          left: `${x}px`,
+          top: `${y}px`
+        });
       });
-    } else if (popperInstance) {
-      popperInstance.destroy();
-      popperInstance = undefined;
     }
   }
 
   const open = () => (isOpen = true);
   const close = () => (isOpen = false);
-  
+
   onMount(registerEventListeners);
   onDestroy(unregisterEventListeners);
 
@@ -53,32 +42,30 @@
   }
 
   function registerEventListeners() {
-
     if (target == null || target.length == 0) {
-        targetEl = null;
-        return;
+      targetEl = null;
+      return;
     }
 
-    // Check if target is HTMLElement 
+    // Check if target is HTMLElement
     try {
-        if (target instanceof HTMLElement) {
-            targetEl = target;
-        }
+      if (target instanceof HTMLElement) {
+        targetEl = target;
+      }
     } catch (e) {
-        // fails on SSR
+      // fails on SSR
     }
 
-    // If targetEl has not been found yet 
+    // If targetEl has not been found yet
     if (targetEl == null) {
-        // Check if target can be found via querySelector
-        try {
-            targetEl = document.querySelector(`#${target}`);
-        }
-        catch (e) {
-            // fails on SSR
-        }
+      // Check if target can be found via querySelector
+      try {
+        targetEl = document.querySelector(`#${target}`);
+      } catch (e) {
+        // fails on SSR
+      }
     }
-    
+
     // If we've found targetEl
     if (targetEl) {
       targetEl.addEventListener('mouseover', open);
@@ -88,7 +75,7 @@
     }
   }
 
-  function unregisterEventListeners() { 
+  function unregisterEventListeners() {
     if (targetEl) {
       targetEl.removeEventListener('mouseover', open);
       targetEl.removeEventListener('mouseleave', close);

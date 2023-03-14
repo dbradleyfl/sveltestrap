@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { createPopper } from '@popperjs/core/dist/esm/popper';
+  import { computePosition } from '@floating-ui/dom';
   import classnames from './utils';
   import InlineContainer from './InlineContainer.svelte';
   import Portal from './Portal.svelte';
@@ -22,34 +22,14 @@
   let bsPlacement;
   let popperPlacement = placement;
 
-  const checkPopperPlacement = {
-    name: 'checkPopperPlacement',
-    enabled: true,
-    phase: 'main',
-    fn({ state }) {
-      popperPlacement = state.placement;
-    }
-  };
-
   $: {
     if (isOpen && popoverEl) {
-      popperInstance = createPopper(targetEl, popoverEl, {
-        placement,
-        modifiers: [
-          checkPopperPlacement,
-          {
-            name: 'offset',
-            options: {
-              offset: () => {
-                return [0, 8];
-              }
-            }
-          }
-        ]
+      computePosition(targetEl, popoverEl).then((x, y) => {
+        Object.assign(popoverEl.style, {
+          left: `${x}px`,
+          top: `${y}px`
+        });
       });
-    } else if (popperInstance) {
-      popperInstance.destroy();
-      popperInstance = undefined;
     }
   }
 

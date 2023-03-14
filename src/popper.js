@@ -1,4 +1,4 @@
-import { createPopper } from '@popperjs/core/dist/esm/popper';
+import { computePosition } from '@floating-ui/dom';
 
 // Code derived from https://github.com/bryanmylee/svelte-popperjs/blob/master/src/index.ts
 export function createPopperActions(initOptions) {
@@ -9,25 +9,19 @@ export function createPopperActions(initOptions) {
 
   const initPopper = () => {
     if (referenceNode && contentNode) {
-      popperInstance = createPopper(referenceNode, contentNode, options);
-    }
-  };
-
-  const deinitPopper = () => {
-    if (popperInstance) {
-      popperInstance.destroy();
-      popperInstance = null;
+      computePosition(referenceNode, contentNode).then((x, y) => {
+        Object.assign(contentNode.style, {
+          left: `${x}px`,
+          top: `${y}px`
+        });
+      });
     }
   };
 
   const referenceAction = (node) => {
     referenceNode = node;
     initPopper();
-    return {
-      destroy() {
-        deinitPopper();
-      }
-    };
+    return {};
   };
 
   const contentAction = (node, contentOptions) => {
@@ -44,9 +38,6 @@ export function createPopperActions(initOptions) {
         if (popperInstance && options) {
           popperInstance.setOptions(options);
         }
-      },
-      destroy() {
-        deinitPopper();
       }
     };
   };
